@@ -1,12 +1,12 @@
 import requests
 from hashlib import sha1
-import sys
+
 
 url = 'https://api.pwnedpasswords.com/range/' + 'CBFDA'
 
 
 # obtaining the pwned passwords api and adding the characters 'CBFDA' to the end due to the sha1 hashing standards
-
+user_input = input("Enter your passwords(comma separated):").split(',')
 
 def request_api_data(query_char):
     url = 'https://api.pwnedpasswords.com/range/' + query_char
@@ -25,6 +25,7 @@ def request_api_data(query_char):
 
 def password_leaks_count(hashes, hash_to_check):
     hashes = (line.split(':') for line in hashes.text.splitlines())
+    #Splits the line to seperate password leaks and the password itself
     for h, count in hashes:
         if h == hash_to_check:
             return count
@@ -35,13 +36,14 @@ def password_leaks_count(hashes, hash_to_check):
 
 def pwned_api_check(password):
     sha1password = sha1(password.encode('utf-8')).hexdigest().upper()
+    # When a password is passed into this function it is encoded with utf-8
+    # and passed into the sha1 function from the hashlib library
+    # We then convert the sha1 object into hexidecimal form and then make it uppercase
     first5_char, tail = sha1password[:5], sha1password[5:]
     response = request_api_data(first5_char)
 
     return password_leaks_count(response, tail)
-    # When a password is passed into this function it is encoded with utf-8
-    # and passed into the sha1 function from the hashlib library
-    # We then convert the sha1 object into hexidecimal form and then make it uppercase
+
 
 def main(arg):
     for password in arg:
@@ -54,5 +56,5 @@ def main(arg):
 
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[1:]))
+    main(user_input)
     #This allows you to run the program and add multiple passwords to check in your terminal
